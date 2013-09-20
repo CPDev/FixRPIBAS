@@ -1,0 +1,30 @@
+import subprocess
+import sys
+import RPi.GPIO as GPIO
+from time import sleep
+
+macDevice = 'XX:XX:XX:XX:XX:XX'
+
+cmdNmap = 'nmap -sP 192.168.1.0/24 | grep '
+
+cmdF = cmdNmap + '' + macDevice
+
+isOnline = False
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(25,GPIO.OUT)
+
+while 1 :
+    cmd = subprocess.Popen(cmdF,shell=True,stdout=subprocess.PIPE)
+    response = cmd.stdout.readlines()
+    res = len(response)
+    print 'Scan Device :' + str(res)
+    if(res > 0 and isOnline == False) :
+        isOnline= True
+        GPIO.output(25,GPIO.HIGH)
+        print "Device Online"
+    elif(res == 0 and isOnline == True) :
+        isOnline = False
+        print "Device Offline"
+        GPIO.output(25,GPIO.LOW)
+sleep(1)
