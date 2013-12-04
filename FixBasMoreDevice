@@ -1,0 +1,35 @@
+import subprocess
+import sys
+import RPi.GPIO as GPIO
+from time import sleep
+import array
+
+address1  = 'xx:xx:xx:xx:xx:xx'
+address2  = 'xx:xx:xx:xx:xx:xx'
+address3  = 'xx:xx:xx:xx:xx:xx''00:00:00:00:00'
+dd = [address1,address2,address3];
+cmdNmap = 'nmap -sP 192.168.1.0/24 | grep '
+
+isOnline = False
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(25,GPIO.OUT)
+
+
+while 1:
+    for i in range(len(dd)):
+        cmdF = cmdNmap + '' + dd[i];
+        cmd = subprocess.Popen(cmdF,shell=True,stdout=subprocess.PIPE)
+        response = cmd.stdout.readlines()
+        res = len(response)
+        print 'Found Device : ' + str(res) + ' Mac : ' + dd[i];
+        if(res > 0 and isOnline == False):
+            isOnline=True
+            GPIO.output(25,GPIO.HIGH)
+            print 'Device : ' + dd[i] + ' Online'
+        elif(res == 0 and isOnline == True) :
+            isOnline = False
+            print 'Device : ' + dd[i] + ' Offline'
+
+sleep(1)
+        
+ 
